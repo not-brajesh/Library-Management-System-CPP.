@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library Management System - C++ Terminal & UI</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-light: #273549;
+      --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --term-bg: #0b0f17;
+      --term-text: #e2e8f0;
+      --term-green: #4ade80;
+      --term-cyan: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+
+    .badge {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--term-cyan);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 7px 13px;
+      transition: 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--panel-light);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: #334155;
+    }
+
+    .btn-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .btn-success:hover {
+      background: rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .btn-warning:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 18px;
+      padding: 18px 24px;
+      flex: 1;
+    }
+
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.35);
+    }
+
+    .card-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    /* Quick Action Forms */
+    .forms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .forms-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-box h3 {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Books Table */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: auto;
+      max-height: 360px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg);
+      color: var(--muted);
+      font-weight: 600;
+      padding: 10px 12px;
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .status-available {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .status-issued {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    /* Terminal Window */
+    .terminal-card {
+      background: var(--term-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 540px;
+    }
+
+    .term-topbar {
+      background: #161b26;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot.red { background: #ef4444; }
+    .dot.yellow { background: #f59e0b; }
+    .dot.green { background: #10b981; }
+
+    .term-title {
+      font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    .term-output {
+      flex: 1;
+      padding: 14px;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 0.83rem;
+      line-height: 1.48;
+      color: var(--term-text);
+      overflow-y: auto;
+      white-space: pre;
+      max-height: 520px;
+    }
+
+    .term-input-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #111622;
+      border-top: 1px solid var(--border);
+      font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+    }
+
+    .prompt-label {
+      color: var(--term-green);
+      font-size: 0.83rem;
+      white-space: nowrap;
+    }
+
+    #termInput {
+      background: transparent;
+      border: none;
+      color: var(--term-cyan);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 4px;
+    }
+
+    .hint-bar {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>Library Management System</h1>
+      <span class="badge">C++ STL + CSV Simulator</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" onclick="downloadCSV()">Download books.csv</button>
+      <label class="btn-secondary" style="cursor:pointer; display:inline-flex; align-items:center;">
+        Load books.csv
+        <input type="file" id="csvUpload" accept=".csv" style="display:none" onchange="uploadCSV(event)" />
+      </label>
+      <button class="btn-secondary" onclick="resetDefaultData()">Reset Sample Data</button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- LEFT: Visual Library Controls & Table -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Library Records (books.csv)</h2>
+        <span id="bookStats" style="font-size: 0.8rem; color: var(--muted);">0 Books</span>
+      </div>
+      <div class="card-body">
+        <div class="forms-grid">
+          <!-- Add Book Form -->
+          <div class="form-box">
+            <h3>1. Add New Book</h3>
+            <div class="input-row">
+              <input type="number" id="addId" placeholder="Book ID (e.g. 111)" />
+            </div>
+            <div class="input-row">
+              <input type="text" id="addTitle" placeholder="Book Title" />
+            </div>
+            <div class="input-row">
+              <input type="text" id="addAuthor" placeholder="Author Name" />
+              <button class="btn-primary" onclick="uiAddBook()">Add</button>
+            </div>
+          </div>
+
+          <!-- Search & Quick Action -->
+          <div class="form-box">
+            <h3>2 & 3. Search Books</h3>
+            <div class="input-row">
+              <input type="number" id="searchIdInput" placeholder="Search by ID" />
+              <button class="btn-secondary" onclick="uiSearchById()">ID</button>
+            </div>
+            <div class="input-row">
+              <input type="text" id="searchKeyInput" placeholder="Title or Author" />
+              <button class="btn-secondary" onclick="uiSearchByKeyword()">Search</button>
+            </div>
+            <div class="input-row">
+              <button class="btn-secondary" style="width:100%" onclick="uiListBooks()">4. List All in Terminal</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="booksTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="hint-bar">
+          <span>Synced with <code>std::map&lt;int, Book&gt;</code> &amp; <code>books.csv</code></span>
+          <span id="saveIndicator" style="color: var(--success);">Saved to books.csv</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Exact C++ Terminal Output -->
+    <div class="terminal-card">
+      <div class="term-topbar">
+        <div class="dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="term-title">zsh — g++ -std=c++17 main.cpp -o library && ./library</span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-secondary" style="padding:4px 9px; font-size:0.75rem;" onclick="clearTerminal()">Clear</button>
+          <button class="btn-primary" style="padding:4px 9px; font-size:0.75rem;" onclick="restartProgram()">Restart ./library</button>
+        </div>
+      </div>
+
+      <div id="termOutput" class="term-output"></div>
+
+      <div class="term-input-bar">
+        <span class="prompt-label" id="promptLabel">input &gt;</span>
+        <input type="text" id="termInput" placeholder="Type option (1-7) or value and press Enter..." autocomplete="off" />
+        <button class="btn-primary" style="padding:5px 12px;" onclick="handleTerminalSubmit()">Enter</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_BOOKS = [
+      { id: 101, title: "Clean Code", author: "Robert C Martin", available: true },
+      { id: 102, title: "The Pragmatic Programmer", author: "Andrew Hunt", available: true },
+      { id: 103, title: "Introduction to Algorithms", author: "Thomas H Cormen", available: false },
+      { id: 104, title: "Atomic Habits", author: "James Clear", available: true },
+      { id: 105, title: "The Alchemist", author: "Paulo Coelho", available: true },
+      { id: 106, title: "Deep Work", author: "Cal Newport", available: false },
+      { id: 107, title: "Design Patterns", author: "Erich Gamma", available: true },
+      { id: 108, title: "Operating System Concepts", author: "Abraham Silberschatz", available: true },
+      { id: 109, title: "Computer Networks", author: "Andrew S Tanenbaum", available: false },
+      { id: 110, title: "Zero to One", author: "Peter Thiel", available: true }
+    ];
+
+    // STL std::map<int, Book> equivalent
+    let books = new Map();
+    let state = "MENU"; // MENU, ADD_ID, ADD_TITLE, ADD_AUTHOR, SEARCH_ID, SEARCH_KEYWORD, ISSUE_ID, RETURN_ID, EXITED
+    let tempAdd = { id: null, title: "" };
+
+    const termOutput = document.getElementById("termOutput");
+    const termInput = document.getElementById("termInput");
+
+    // Helpers matching C++ implementation
+    function sanitizeCSV(text) {
+      return text.replace(/,/g, ";");
+    }
+
+    function padRight(str, width) {
+      str = String(str);
+      return str.length >= width ? str : str + " ".repeat(width - str.length);
+    }
+
+    function isValidInt(str) {
+      return /^-?\d+$/.test(str.trim());
+    }
+
+    function saveToStorage() {
+      const arr = Array.from(books.values()).sort((a, b) => a.id - b.id);
+      localStorage.setItem("cpp_library_books_csv", JSON.stringify(arr));
+      renderTable();
+    }
+
+    function loadFromStorage() {
+      const saved = localStorage.getItem("cpp_library_books_csv");
+      books.clear();
+      const list = saved ? JSON.parse(saved) : DEFAULT_BOOKS;
+      list.forEach(b => books.set(Number(b.id), { ...b, id: Number(b.id) }));
+      renderTable();
+    }
+
+    function printTerm(text) {
+      termOutput.textContent += text;
+      termOutput.scrollTop = termOutput.scrollHeight;
+    }
+
+    function printMenu() {
+      state = "MENU";
+      printTerm(
+        "\nLibrary Management System\n" +
+        "1 Add Book\n" +
+        "2 Search Book by ID\n" +
+        "3 Search Book by Title or Author\n" +
+        "4 List All Books\n" +
+        "5 Issue Book\n" +
+        "6 Return Book\n" +
+        "7 Exit\n" +
+        "Choose an option from 1 to 7 "
+      );
+    }
+
+    // Core C++ Library Methods
+    function cppAddBook(id, title, author) {
+      if (books.has(id)) {
+        printTerm(`Book ID ${id} already exists\n`);
+        return;
+      }
+      if (!title.trim() || !author.trim()) {
+        printTerm("Title and author cannot be empty\n");
+        return;
+      }
+      books.set(id, { id, title: title.trim(), author: author.trim(), available: true });
+      saveToStorage();
+      printTerm(`Book ${title.trim()} added and saved\n`);
+    }
+
+    function cppSearchById(id) {
+      if (!books.has(id)) {
+        printTerm(`Book ID ${id} not found\n`);
+        return;
+      }
+      const b = books.get(id);
+      printTerm(
+        `\nBook Details\n` +
+        `ID ${b.id}\n` +
+        `Title ${b.title}\n` +
+        `Author ${b.author}\n` +
+        `Status ${b.available ? "Available" : "Issued"}\n`
+      );
+    }
+
+    function cppSearchByKeyword(keyword) {
+      const query = keyword.toLowerCase();
+      let found = false;
+      printTerm("\nSearch Results\n");
+      const sortedIds = Array.from(books.keys()).sort((a, b) => a - b);
+      for (const id of sortedIds) {
+        const b = books.get(id);
+        if (b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query)) {
+          printTerm(`${b.id} ${b.title} by ${b.author} ${b.available ? "Available" : "Issued"}\n`);
+          found = true;
+        }
+      }
+      if (!found) {
+        printTerm(`No matching book found for ${keyword}\n`);
+      }
+    }
+
+    function cppListBooks() {
+      if (books.size === 0) {
+        printTerm("Library is empty please add some books first\n");
+        return;
+      }
+      printTerm(
+        "\n" +
+        padRight("ID", 8) +
+        padRight("Title", 30) +
+        padRight("Author", 25) +
+        padRight("Status", 12) + "\n\n"
+      );
+      const sortedIds = Array.from(books.keys()).sort((a, b) => a - b);
+      for (const id of sortedIds) {
+        const b = books.get(id);
+        printTerm(
+          padRight(b.id, 8) +
+          padRight(b.title.slice(0, 28), 30) +
+          padRight(b.author.slice(0, 23), 25) +
+          padRight(b.available ? "Available" : "Issued", 12) + "\n"
+        );
+      }
+    }
+
+    function cppIssueBook(id) {
+      if (!books.has(id)) {
+        printTerm(`Unknown Book ID ${id}\n`);
+        return;
+      }
+      const b = books.get(id);
+      if (!b.available) {
+        printTerm(`${b.title} is already issued\n`);
+        return;
+      }
+      b.available = false;
+      saveToStorage();
+      printTerm(`${b.title} has been issued\n`);
+    }
+
+    function cppReturnBook(id) {
+      if (!books.has(id)) {
+        printTerm(`Unknown Book ID ${id}\n`);
+        return;
+      }
+      const b = books.get(id);
+      if (b.available) {
+        printTerm(`${b.title} is already available in the library\n`);
+        return;
+      }
+      b.available = true;
+      saveToStorage();
+      printTerm(`${b.title} has been returned\n`);
+    }
+
+    // Handle Interactive Terminal Input
+    function handleTerminalSubmit() {
+      const raw = termInput.value;
+      termInput.value = "";
+      printTerm(raw + "\n");
+
+      if (state === "EXITED") {
+        if (raw.trim() === "./library") {
+          restartProgram();
+        } else {
+          printTerm("brajeshkumar@MacBook-Air library % ");
+        }
+        return;
+      }
+
+      if (state === "MENU") {
+        if (!isValidInt(raw)) {
+          printTerm("Invalid input please enter a number only\nChoose an option from 1 to 7 ");
+          return;
+        }
+        const choice = parseInt(raw.trim(), 10);
+        switch (choice) {
+          case 1:
+            state = "ADD_ID";
+            printTerm("Enter book ID ");
+            break;
+          case 2:
+            state = "SEARCH_ID";
+            printTerm("Enter book ID to search ");
+            break;
+          case 3:
+            state = "SEARCH_KEYWORD";
+            printTerm("Enter title or author name ");
+            break;
+          case 4:
+            cppListBooks();
+            printMenu();
+            break;
+          case 5:
+            state = "ISSUE_ID";
+            printTerm("Enter book ID to issue ");
+            break;
+          case 6:
+            state = "RETURN_ID";
+            printTerm("Enter book ID to return ");
+            break;
+          case 7:
+            printTerm("Data saved exiting program\nbrajeshkumar@MacBook-Air library % ");
+            state = "EXITED";
+            break;
+          default:
+            printTerm("Wrong choice please select a number between 1 and 7\n");
+            printMenu();
+        }
+        return;
+      }
+
+      if (state === "ADD_ID") {
+        if (!isValidInt(raw)) {
+          printTerm("Invalid input please enter a number only\nEnter book ID ");
+          return;
+        }
+        tempAdd.id = parseInt(raw.trim(), 10);
+        state = "ADD_TITLE";
+        printTerm("Enter book title ");
+        return;
+      }
+
+      if (state === "ADD_TITLE") {
+        tempAdd.title = raw;
+        state = "ADD_AUTHOR";
+        printTerm("Enter author name ");
+        return;
+      }
+
+      if (state === "ADD_AUTHOR") {
+        cppAddBook(tempAdd.id, tempAdd.title, raw);
+        printMenu();
+        return;
+      }
+
+      if (state === "SEARCH_ID") {
+        if (!isValidInt(raw)) {
+          printTerm("Invalid input please enter a number only\nEnter book ID to search ");
+          return;
+        }
+        cppSearchById(parseInt(raw.trim(), 10));
+        printMenu();
+        return;
+      }
+
+      if (state === "SEARCH_KEYWORD") {
+        cppSearchByKeyword(raw);
+        printMenu();
+        return;
+      }
+
+      if (state === "ISSUE_ID") {
+        if (!isValidInt(raw)) {
+          printTerm("Invalid input please enter a number only\nEnter book ID to issue ");
+          return;
+        }
+        cppIssueBook(parseInt(raw.trim(), 10));
+        printMenu();
+        return;
+      }
+
+      if (state === "RETURN_ID") {
+        if (!isValidInt(raw)) {
+          printTerm("Invalid input please enter a number only\nEnter book ID to return ");
+          return;
+        }
+        cppReturnBook(parseInt(raw.trim(), 10));
+        printMenu();
+        return;
+      }
+    }
+
+    termInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleTerminalSubmit();
+    });
+
+    // Visual UI Handlers (Sync directly with Terminal Output)
+    function ensureActiveTerminal() {
+      if (state === "EXITED") {
+        printTerm("./library\n");
+        printMenu();
+      } else if (state !== "MENU") {
+        printTerm("\n");
+        printMenu();
+      }
+    }
+
+    function uiAddBook() {
+      const idVal = document.getElementById("addId").value.trim();
+      const titleVal = document.getElementById("addTitle").value;
+      const authorVal = document.getElementById("addAuthor").value;
+
+      ensureActiveTerminal();
+      printTerm(`1\nEnter book ID ${idVal}\n`);
+      if (!isValidInt(idVal)) {
+        printTerm("Invalid input please enter a number only\n");
+        printMenu();
+        return;
+      }
+      printTerm(`Enter book title ${titleVal}\nEnter author name ${authorVal}\n`);
+      cppAddBook(parseInt(idVal, 10), titleVal, authorVal);
+      printMenu();
+
+      document.getElementById("addId").value = "";
+      document.getElementById("addTitle").value = "";
+      document.getElementById("addAuthor").value = "";
+    }
+
+    function uiSearchById() {
+      const idVal = document.getElementById("searchIdInput").value.trim();
+      ensureActiveTerminal();
+      printTerm(`2\nEnter book ID to search ${idVal}\n`);
+      if (!isValidInt(idVal)) {
+        printTerm("Invalid input please enter a number only\n");
+        printMenu();
+        return;
+      }
+      cppSearchById(parseInt(idVal, 10));
+      printMenu();
+    }
+
+    function uiSearchByKeyword() {
+      const keyVal = document.getElementById("searchKeyInput").value;
+      ensureActiveTerminal();
+      printTerm(`3\nEnter title or author name ${keyVal}\n`);
+      cppSearchByKeyword(keyVal);
+      printMenu();
+    }
+
+    function uiListBooks() {
+      ensureActiveTerminal();
+      printTerm("4\n");
+      cppListBooks();
+      printMenu();
+    }
+
+    function uiIssueBook(id) {
+      ensureActiveTerminal();
+      printTerm(`5\nEnter book ID to issue ${id}\n`);
+      cppIssueBook(id);
+      printMenu();
+    }
+
+    function uiReturnBook(id) {
+      ensureActiveTerminal();
+      printTerm(`6\nEnter book ID to return ${id}\n`);
+      cppReturnBook(id);
+      printMenu();
+    }
+
+    // Render Table
+    function renderTable() {
+      const tbody = document.getElementById("booksTableBody");
+      tbody.innerHTML = "";
+      const sortedIds = Array.from(books.keys()).sort((a, b) => a - b);
+
+      let availCount = 0;
+      for (const id of sortedIds) {
+        const b = books.get(id);
+        if (b.available) availCount++;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${b.id}</strong></td>
+          <td>${escapeHtml(b.title)}</td>
+          <td>${escapeHtml(b.author)}</td>
+          <td>
+            <span class="status-pill ${b.available ? "status-available" : "status-issued"}">
+              ${b.available ? "Available" : "Issued"}
+            </span>
+          </td>
+          <td>
+            ${
+              b.available
+                ? `<button class="btn-warning" style="padding:4px 9px; font-size:0.78rem;" onclick="uiIssueBook(${b.id})">Issue</button>`
+                : `<button class="btn-success" style="padding:4px 9px; font-size:0.78rem;" onclick="uiReturnBook(${b.id})">Return</button>`
+            }
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById("bookStats").textContent =
+        `${books.size} Total (${availCount} Available, ${books.size - availCount} Issued)`;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // CSV Download & Upload
+    function downloadCSV() {
+      let csv = "ID,Title,Author,Available\n";
+      const sortedIds = Array.from(books.keys()).sort((a, b) => a - b);
+      for (const id of sortedIds) {
+        const b = books.get(id);
+        csv += `${b.id},${sanitizeCSV(b.title)},${sanitizeCSV(b.author)},${b.available ? "1" : "0"}\n`;
+      }
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "books.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function uploadCSV(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const lines = e.target.result.split(/\r?\n/);
+        books.clear();
+        lines.forEach((line, idx) => {
+          if (!line.trim()) return;
+          if (idx === 0 && line.startsWith("ID,")) return;
+          const parts = line.split(",");
+          if (parts.length >= 4 && isValidInt(parts[0])) {
+            const id = parseInt(parts[0].trim(), 10);
+            const title = parts[1].trim();
+            const author = parts[2].trim();
+            const availStr = parts[3].trim().toLowerCase();
+            const available = availStr === "1" || availStr === "true";
+            books.set(id, { id, title, author, available });
+          }
+        });
+        saveToStorage();
+        restartProgram();
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function resetDefaultData() {
+      localStorage.removeItem("cpp_library_books_csv");
+      loadFromStorage();
+      restartProgram();
+    }
+
+    function clearTerminal() {
+      termOutput.textContent = "";
+      if (state !== "EXITED") printMenu();
+    }
+
+    function restartProgram() {
+      termOutput.textContent = "brajeshkumar@MacBook-Air library % ./library\n";
+      printMenu();
+      termInput.focus();
+    }
+
+    // Boot
+    loadFromStorage();
+    restartProgram();
+  </script>
+</body>
+</html>
